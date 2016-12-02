@@ -1,0 +1,173 @@
+<!doctype html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html class="no-js" lang="en" data-useragent="Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> Automatic Pet Feeder</title>
+        
+	
+	<link rel="stylesheet" href="http://69.88.163.32/css/normalize.css">
+    <link rel="stylesheet" href="http://69.88.163.32/css/foundation.css">
+    <link rel="stylesheet" href="http://nao.fgcu.edu/css/site.css">
+	<script src="http://69.88.163.32/js/vendor/modernizr.js"></script>
+	
+	
+	<meta content="Allows remote control of the NAO robot via a webpage." name="description" />
+    
+	<script type="text/javascript" src="http://69.88.163.32/js/vendor/jquery.js"></script>
+	<script type="text/javascript">
+		var ws;
+			
+		function connectSocketServer() 
+		{
+			var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
+
+			if (support == null) 
+			{
+				alert("Error: Your browser does not support WebSockets");
+				return;
+			}	
+            
+			// create a new websocket and connect
+            ws = new window[support]('ws://69.88.163.32:443/');
+
+            // when data is comming from the server, this metod is called
+            ws.onmessage = function (evt) 
+			{
+                $("#image").attr('src',  'data:image/jpg;base64,'+evt.data);
+            };
+
+            // when the connection is established, this method is called
+            ws.onopen = function () 
+			{
+				ws.send("start");
+                $('#connectButton').attr("disabled", "disabled");
+                $('#disconnectButton').attr("disabled", "");
+            };
+
+            // when the connection is closed, this method is called
+            ws.onclose = function () 
+			{
+                $('#connectButton').attr("disabled", "");
+                $('#disconnectButton').attr("disabled", "disabled");
+            }
+        }
+		
+		function feed()
+            {
+                if (ws)
+                {
+                    ws.send("feed");
+                }
+            }
+
+        function disconnectWebSocket() 
+		{
+            if (ws) 
+			{
+                ws.close();
+            }
+        }
+		
+		function reconnectNao()
+		{
+			if (ws)
+			{
+				ws.send("reconnect");
+			}
+		}
+
+        function connectWebSocket() 
+		{
+			connectSocketServer();
+		}
+
+		window.onload = function () 
+		{
+			$('#disconnectButton').attr("disabled", "disabled");
+		}
+    
+    </script>
+</head>
+
+
+<body>
+
+<!-- Navigation -->
+
+  <nav class="top-bar" data-topbar>
+    <ul class="title-area">
+      <!-- Title Area -->
+      <li class="name">
+        <h1>
+          <a href="http://nao.fgcu.edu/">
+            FGCU NAO Home
+          </a>
+        </h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
+    </ul>
+ 
+    <section class="top-bar-section">
+      <!-- Right Nav Section -->
+      <ul class="right">
+        <li class="has-dropdown">
+        <a href="#">Projects</a>
+        <ul class="dropdown">
+          <li><a href="http://nao.fgcu.edu/websockets">NAO Control via Websockets</a></li>
+	       <li><a href="http://nao.fgcu.edu/request">NAO Request</a></li>
+        </ul>
+      </li>
+        <li class="divider"></li>
+      </ul>
+    </section>
+  </nav>
+ 
+  <!-- End Top Bar -->
+  
+    <div class="row ">
+        <div class="large-12 columns">
+		<h5> Computer Networks NAO Project </h5>
+        <h5> Automatic Pet Feeder </h5>
+
+			<p><input type="button" id="connectButton" value="Connect" onclick="connectWebSocket()"/> 
+                <input type="button" id="disconnectButton" value="Disconnect" onclick="disconnectWebSocket()"/> <br /></p> 
+			<br />
+			<br />
+        
+       <p><button id="demo" onclick="feed(); show();">Feed Pet</button></p>
+        
+        <p> Status of request: </p>
+        <script>
+            function show() { 
+                if(document.getElementById('fed').style.display=='none') { 
+                    document.getElementById('fed').style.display='block'; 
+                } 
+                return false;
+            }    
+        </script>
+    <div id="fed" style="display:none;">Your pet was fed </div> 
+		
+	<!-- Footer -->
+
+	<footer class="row">
+	  <div class="large-12 columns"><hr />
+		  <div class="row">
+			<div class="large-6 columns">
+				<p>&copy; 2016 FGCU Software Engineering</p>
+			</div>
+		  </div>
+	  </div>
+	</footer>
+
+
+    <script src="http://69.88.163.32/js/vendor/jquery.js"></script>
+    <script src="http://69.88.163.32/js/foundation.min.js"></script>
+	
+    <script>
+      $(document).foundation();
+    </script>
+</body>
+
+</html>
